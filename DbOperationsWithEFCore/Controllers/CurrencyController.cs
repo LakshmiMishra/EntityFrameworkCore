@@ -12,7 +12,7 @@ namespace DbOperationsWithEFCore.Controllers
     {
         public readonly AppDbContext _appDbContext;
         public CurrencyController(AppDbContext appDbContext)
-        { 
+        {
             _appDbContext = appDbContext;
 
         }
@@ -22,6 +22,28 @@ namespace DbOperationsWithEFCore.Controllers
         {
             var currencies = await _appDbContext.Currencies.ToListAsync();
             return Ok(currencies);
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetCurrencyById([FromRoute] int id)
+        {
+            // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Id == id).FirstOrDefaultAsync(); 
+            var currencyDetails = await _appDbContext.Currencies.FindAsync(id);//finding data by using primary key
+            if (currencyDetails == null)
+                return NotFound("Currency Do Not Exists");
+            else
+                return Ok(currencyDetails);
+        }
+
+        [HttpGet("{name}")]
+        public async Task<IActionResult> GetCurrencyByName([FromRoute] string name)
+        {
+           // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Title == name).FirstOrDefaultAsync();
+            var currencyDetails = await _appDbContext.Currencies.FirstOrDefaultAsync(cur => cur.Title == name);
+            if (currencyDetails == null)
+                return NotFound("Currency Do Not Exists");
+            else
+                return Ok(currencyDetails);
         }
     }
 }
