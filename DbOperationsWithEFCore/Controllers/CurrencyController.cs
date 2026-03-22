@@ -27,7 +27,6 @@ namespace DbOperationsWithEFCore.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetCurrencyById([FromRoute] int id)
         {
-            // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Id == id).FirstOrDefaultAsync(); 
             var currencyDetails = await _appDbContext.Currencies.FindAsync(id);//finding data by using primary key
             if (currencyDetails == null)
                 return NotFound("Currency Do Not Exists");
@@ -36,10 +35,14 @@ namespace DbOperationsWithEFCore.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<IActionResult> GetCurrencyByName([FromRoute] string name)
+        public async Task<IActionResult> GetCurrencyByName([FromRoute] string name, [FromQuery] string? description)
         {
-           // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Title == name).FirstOrDefaultAsync();
-            var currencyDetails = await _appDbContext.Currencies.FirstOrDefaultAsync(cur => cur.Title == name);
+            // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Title == name).FirstOrDefaultAsync();
+            // var currencyDetails = await _appDbContext.Currencies.FirstOrDefaultAsync(cur => cur.Title == name);
+            //   var currencyDetails = await _appDbContext.Currencies.SingleOrDefaultAsync(cur => cur.Title == name && cur.Description == description);
+            var currencyDetails = await _appDbContext.Currencies.
+                FirstOrDefaultAsync(cur => cur.Title == name
+                && (string.IsNullOrEmpty(description) || cur.Description == description));
             if (currencyDetails == null)
                 return NotFound("Currency Do Not Exists");
             else
