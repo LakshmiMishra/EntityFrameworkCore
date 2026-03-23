@@ -7,11 +7,13 @@
         public string Description { get; set; }
         public int NoOfPages { get; set; }
         public bool IsActive { get; set; }
-
+        public  int? AuthorId  { get; set; }
         public DateOnly PublishedDate { get; set; }
 
         public  int  LanguageId { get; set; }
         public Language? Language { get; set; }
+        public Author? Author { get; set; }
+  
     }
    
 }
