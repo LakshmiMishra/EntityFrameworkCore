@@ -25,5 +25,23 @@ namespace DbOperationsWithEFCore.Controllers
             return Ok(books);
         }
 
+        [HttpPut("{bookid}")]
+        public async Task<IActionResult> UpdateBook([FromRoute] int bookid, [FromBody] Book bookupdate)
+        {
+            //find the book whose valuse need to be update
+            var book = await appDbContext.Books.FindAsync(bookid);
+            if(book is null)
+            {
+                return NotFound();
+            }
+            book.Title = bookupdate.Title;
+            book.Description = bookupdate.Description;
+            book.NoOfPages = bookupdate.NoOfPages;
+            book.IsActive = bookupdate.IsActive;
+
+            await appDbContext.SaveChangesAsync();
+            return Ok(book);
+
+        }
     }
 }
