@@ -89,10 +89,15 @@ namespace DbOperationsWithEFCore.Controllers
         [HttpDelete("bulkdelete")]
         public async Task<IActionResult> BulkDelete()
         {
-            var books = await appDbContext.Books.Where(b => b.IsActive == false).ToListAsync();
-            appDbContext.Books.RemoveRange(books);// change tracking happens
-            await appDbContext.SaveChangesAsync();
-            return Ok("Bulk deleted successfully with 2 Db hit");
+            //Bulk delete with 2 DB hits
+            //var books = await appDbContext.Books.Where(b => b.IsActive == false).ToListAsync();
+            //appDbContext.Books.RemoveRange(books);// change tracking happens
+            //await appDbContext.SaveChangesAsync();
+
+            //Bulk delete with 1 db hit
+            await appDbContext.Books.Where(b=>b.NoOfPages== 100).ExecuteDeleteAsync();
+
+            return Ok("Bulk deleted successfully with 1 Db hit");
         }
     }
 }
