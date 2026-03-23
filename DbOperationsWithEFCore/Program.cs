@@ -1,6 +1,7 @@
 
 using DbOperationsWithEFCore.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace DbOperationsWithEFCore
 {
@@ -14,9 +15,13 @@ namespace DbOperationsWithEFCore
             {
                options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection"));
             });
+      
+
+            builder.Services.AddControllers().AddJsonOptions(x =>
+   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            //    builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

@@ -2,6 +2,7 @@
 using DbOperationsWithEFCore.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DbOperationsWithEFCore.Controllers
 {
@@ -26,11 +27,11 @@ namespace DbOperationsWithEFCore.Controllers
         }
 
         [HttpPut("{bookid}")]
-        public async Task<IActionResult> UpdateBook([FromRoute] int bookid, [FromBody] Book bookupdate)
+        public async Task<IActionResult> UpdateBook([FromRoute]int bookid,[FromBody] Book bookupdate)
         {
-            //find the book whose valuse need to be update
+           // find the book whose valuse need to be update
             var book = await appDbContext.Books.FindAsync(bookid);
-            if(book is null)
+            if (book is null)
             {
                 return NotFound();
             }
@@ -39,8 +40,25 @@ namespace DbOperationsWithEFCore.Controllers
             book.NoOfPages = bookupdate.NoOfPages;
             book.IsActive = bookupdate.IsActive;
 
+            //update the book with new values   
+            //var book = appDbContext.Books.Update(bookupdate);
             await appDbContext.SaveChangesAsync();
             return Ok(book);
+
+        }
+
+
+        [HttpPut("bulkupdate")]
+        public async Task<IActionResult> BulkUpdate()
+        {
+            await appDbContext.Books.Where(book=>book.NoOfPages==20)
+                .ExecuteUpdateAsync(book => book
+                .SetProperty(book => book.Description, "bulk updated")
+                .SetProperty(book => book.LanguageId, 2)
+                .SetProperty(book=>book.NoOfPages,100)
+             );
+            await appDbContext.SaveChangesAsync();
+            return Ok();
 
         }
     }
