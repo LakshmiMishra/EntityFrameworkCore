@@ -27,9 +27,9 @@ namespace DbOperationsWithEFCore.Controllers
         }
 
         [HttpPut("{bookid}")]
-        public async Task<IActionResult> UpdateBook([FromRoute]int bookid,[FromBody] Book bookupdate)
+        public async Task<IActionResult> UpdateBook([FromRoute] int bookid, [FromBody] Book bookupdate)
         {
-           // find the book whose valuse need to be update
+            // find the book whose valuse need to be update
             var book = await appDbContext.Books.FindAsync(bookid);
             if (book is null)
             {
@@ -51,15 +51,48 @@ namespace DbOperationsWithEFCore.Controllers
         [HttpPut("bulkupdate")]
         public async Task<IActionResult> BulkUpdate()
         {
-            await appDbContext.Books.Where(book=>book.NoOfPages==20)
+            await appDbContext.Books.Where(book => book.NoOfPages == 20)
                 .ExecuteUpdateAsync(book => book
                 .SetProperty(book => book.Description, "bulk updated")
                 .SetProperty(book => book.LanguageId, 2)
-                .SetProperty(book=>book.NoOfPages,100)
+                .SetProperty(book => book.NoOfPages, 100)
              );
-         
+
             return Ok();
 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            //var book = await appDbContext.Books.FindAsync(id);
+            //if(book is null)
+            //    return NotFound();
+            //else
+            //{
+            //    appDbContext.Remove(book);
+            //  var res= await appDbContext.SaveChangesAsync();
+            //}
+            //Above commented code hits DB twice, first to find the record and second to delete the record. Below code hits DB only once.
+
+            //We can do this in 1 DB call using ExecuteDeleteAsync method.
+            //It will delete the record without fetching it first.or by changing the trcakingstate
+
+            // await appDbContext.Books.Where(book => book.Id == id).ExecuteDeleteAsync();
+            var book = new Book { Id = id };
+            appDbContext.Entry(book).State = EntityState.Deleted;
+            await appDbContext.SaveChangesAsync();
+
+            return Ok("Record deleted successfully");
+        }
+
+        [HttpDelete("bulkdelete")]
+        public async Task<IActionResult> BulkDelete()
+        {
+            var books = await appDbContext.Books.Where(b => b.IsActive == false).ToListAsync();
+            appDbContext.Books.RemoveRange(books);// change tracking happens
+            await appDbContext.SaveChangesAsync();
+            return Ok("Bulk deleted successfully with 2 Db hit");
         }
     }
 }
