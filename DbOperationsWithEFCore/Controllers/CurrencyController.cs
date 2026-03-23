@@ -3,6 +3,7 @@ using DbOperationsWithEFCore.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace DbOperationsWithEFCore.Controllers
 {
@@ -47,6 +48,24 @@ namespace DbOperationsWithEFCore.Controllers
                 return NotFound("Currency Do Not Exists");
             else
                 return Ok(currencyDetails);
+        }
+        [HttpPost("all")]
+        public async Task<IActionResult> GetCurrencyByIds([FromBody]List<int> Ids)
+        {
+            // var currencyDetails = await _appDbContext.Currencies.Where(cur => cur.Title == name).FirstOrDefaultAsync();
+            // var currencyDetails = await _appDbContext.Currencies.FirstOrDefaultAsync(cur => cur.Title == name);
+            //   var currencyDetails = await _appDbContext.Currencies.SingleOrDefaultAsync(cur => cur.Title == name && cur.Description == description);
+            var currencies = await _appDbContext.Currencies
+                .Where(cur => Ids.Contains(cur.Id))
+                .Select(cur=>new Currency
+                {
+                    Id = cur.Id,
+                    Title = cur.Title
+                }).ToListAsync();
+            if (currencies == null)
+                return NotFound("Currency Ids Do Not Exists");
+            else
+                return Ok(currencies);
         }
     }
 }
