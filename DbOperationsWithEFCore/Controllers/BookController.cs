@@ -57,7 +57,7 @@ namespace DbOperationsWithEFCore.Controllers
                 .SetProperty(book => book.LanguageId, 2)
                 .SetProperty(book=>book.NoOfPages,100)
              );
-            await appDbContext.SaveChangesAsync();
+         
             return Ok();
 
         }
