@@ -10,6 +10,18 @@ namespace DbOperationsWithEFCore.Controllers
     [ApiController]
     public class BooksController(AppDbContext appDbContext) : ControllerBase
     {
+        [HttpGet]
+        public async Task<IActionResult> GetBooksAsync()
+        {
+            var books = await appDbContext.
+                Books.
+                Include(x=>x.Author)
+               // .Include(x=>x.Language)
+                .ToListAsync();//eager loading
+            return Ok(books);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> AddNewBook([FromBody] Book book)
         {

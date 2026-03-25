@@ -15,10 +15,12 @@ namespace DbOperationsWithEFCore.Controllers
             _appDbContext = appContext;
         }
 
-        [HttpGet("")]
+        [HttpGet("languages")]
         public async Task<IActionResult> GetLanguages()
         {
-            var languages = await _appDbContext.Languages.ToListAsync();
+            var languages = await _appDbContext.Languages
+                .Include(x => x.Books)
+                .ToListAsync();
             return Ok(languages);
         }
     }
